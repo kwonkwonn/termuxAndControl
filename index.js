@@ -1,14 +1,23 @@
+
+const {exec}=require('child_process');
+const {userLocation}=require('./functions/userLocation.js')
+
 function main() {
-  const axios = require("axios");
-  getData(axios);
+
+
+
+
+exec('termux-microphone-record -f ./voiceRecorded/1 ', (err, stdout,stderr)=>{
+	if(err){
+		return;}
+
+	console.log(`stdout: ${stdout}`);
+	console.log(`stderr: ${stderr}`);
+})
+
+	userLocation();
 }
 
 main();
-async function getData(axios) {
-  try {
-    const response = await axios.get("http://google.com");
-    console.log(response.data);
-  } catch (error) {
-    console.error(error);
-  }
-}
+
+
