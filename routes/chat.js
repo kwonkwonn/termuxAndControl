@@ -1,5 +1,9 @@
 const { userLocation } = require("../functions/userLocation.js");
-const { voiceRecord, quitRecord } = require("../functions/voiceRecorder.js");
+const {
+  voiceRecord,
+  quitRecord,
+  sendVoice,
+} = require("../functions/voiceRecorder.js");
 const { vibrate } = require("../functions/vibrate.js");
 const { exec } = require("child_process");
 const dotenv = require("dotenv");
