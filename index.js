@@ -1,19 +1,13 @@
 
 const {exec}=require('child_process');
-const {userLocation}=require('./functions/userLocation.js')
+const {userLocation}=require('./functions/userLocation.js');
+const {voiceRecord} = require('./functions/voiceRecorder.js');
 
 function main() {
+console.log(userLocation);
 
+	voiceRecord();
 
-
-
-exec('termux-microphone-record -f ./voiceRecorded/1 ', (err, stdout,stderr)=>{
-	if(err){
-		return;}
-
-	console.log(`stdout: ${stdout}`);
-	console.log(`stderr: ${stderr}`);
-})
 
 	userLocation();
 }
