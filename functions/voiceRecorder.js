@@ -52,6 +52,7 @@ async function sendVoice(number) {
     const response = await openai.audio.transcriptions.create({
       file: fs.createReadStream(`./voiceRecorded/voice${number}.mp3`),
       model: "whisper-1",
+	    response_format:"text",
     });
     return response.text;
   } catch (error) {
