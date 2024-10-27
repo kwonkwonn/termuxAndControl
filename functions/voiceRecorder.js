@@ -54,31 +54,29 @@ async function sendVoice(number) {
       model: "whisper-1",
 	    response_format:"text",
     });
-    return response.text;
-  } catch (error) {
+    
+ 
+
+   const chatResponse = await openai.chat.completions.create({
+         model: "gpt-4",
+         temperature: temperature,
+         messages: [
+           {
+             role: "system",
+             content: systemPrompt,
+           },
+           {
+             role: "user",
+             content: response,
+           },
+         ],
+       });
+
+       return chatResponse.choices[0].message.content;
+}catch (error) {
     console.error("OpenAI API 호출 중 오류 발생:", error);
     throw error;
   }
-  //     const chatResponse = await openai.chat.completions.create({
-  //       model: "gpt-4",
-  //       temperature: temperature,
-  //       messages: [
-  //         {
-  //           role: "system",
-  //           content: systemPrompt,
-  //         },
-  //         {
-  //           role: "user",
-  //           content: response.text,
-  //         },
-  //       ],
-  //     });
-
-  //     return chatResponse.choices[0].message.content;
-  //   } catch (error) {
-  //     console.error("OpenAI API 호출 중 오류 발생:", error);
-  //     throw error;
-  //   }
 }
 
 module.exports = { voiceRecord, quitRecord, sendVoice };
