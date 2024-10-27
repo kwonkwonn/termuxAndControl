@@ -9,6 +9,7 @@ dotenv.config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+
 });
 
 const systemPrompt =
@@ -19,7 +20,7 @@ const temperature = 0.7; // 온도 값 설정
 function voiceRecord(time, number) {
   return new Promise((resolve, reject) => {
     exec(
-      `termux-microphone-record -f ./voiceRecorded/voice${number} -l ${time}`,
+      `termux-microphone-record -e awr_wide -f ./voiceRecorded/voice${number}.amr -l ${time}`,
       (err, stdout, stderr) => {
         if (err) {
           reject(err);
@@ -43,14 +44,15 @@ function quitRecord() {
         console.log(`stderr: ${stderr}`);
         resolve();
       }
-    });
+    }).then(()=>{exec(`ffmpeq -i voice${number}.amr voice${number}.mp3`)})
+	  
   });
 }
 
 async function sendVoice(number) {
   try {
     const response = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(`./voiceRecorded/voice${number}`),
+      file: fs.createReadStream(`./voiceRecorded/voice${number}.mp3`),
       model: "whisper-1",
     });
     return response.text;
