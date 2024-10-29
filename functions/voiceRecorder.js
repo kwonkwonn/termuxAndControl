@@ -20,7 +20,11 @@ const temperature = 0.7; // 온도 값 설정
 
 async function voiceRecord(time, number) {
   try {
-    const { stdout, stderr } = await execPromise(
+   execPromise(`rm ./voiceRecorded/*`); 
+	
+
+
+const { stdout, stderr } = await execPromise(
       `termux-microphone-record -e awr_wide -f ./voiceRecorded/voice${number}.amr -l ${time}`
     );
     console.log(`stdout: ${stdout}`);
@@ -54,9 +58,15 @@ async function sendVoice(number) {
       model: "whisper-1",
 	    response_format:"text",
     });
+	return response;
+	}catch(err){
+		console.log(err);
+		throw err;}
+}
     
  
-
+async function chatAI(response){ 
+	try{ 
    const chatResponse = await openai.chat.completions.create({
          model: "gpt-4",
          temperature: temperature,
@@ -79,4 +89,4 @@ async function sendVoice(number) {
   }
 }
 
-module.exports = { voiceRecord, quitRecord, sendVoice };
+module.exports = { voiceRecord, quitRecord, sendVoice, chatAI };
