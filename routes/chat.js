@@ -42,6 +42,7 @@ try{
 	
   sessionNumber %= 20;
   sessionNumber++;
+  console.log(sessionNumber);
   res.end();
 } )     }catch(err){
 	console.log(err);
