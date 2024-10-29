@@ -14,8 +14,6 @@ app.use(cors());
 
 // 로봇 서버(WebSocket)와 연결 설정
 const robotSocket = io("http://ROBOT_SERVER_URL:ROBOT_PORT"); // 로봇 서버 주소로 대체
-const port = process.env.PORT || "3000";
-app.set("port", port);
 robotSocket.on("connect", () => {
   console.log("Connected to robot server");
 });
@@ -39,12 +37,15 @@ app.use((req, res, next) => {
   next();
 });
 
+app.set("robotSocket", robotSocket);
+app.use((req, res, next) => {
+  req.robotSocket = robotSocket;
+  next();
+});
 app.use("/chat", chatRouter);
 app.use("/robot", socketRouter);
 
-// robotSocket을 다른 모듈에서 사용할 수 있도록 설정
-app.set("robotSocket", robotSocket);
-
+// robotSocket을 다른 모듈에서
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
