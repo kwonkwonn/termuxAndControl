@@ -15,11 +15,27 @@ const MobileChatInterface = () => {
     scrollToBottom();
   }, [messages]);
 
+  const handleRobot = async (command) => {
+    try {
+      const response = fetch("http://localhost:3000/user/robotControl", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          command: command,
+          text: "hello",
+        }),
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const handleButtonPress = async () => {
     if (!isPressed) {
       try {
         setIsPressed(true);
-        const response = await fetch("https://localhost:3000/chatVoice");
+        const response = await fetch("http://localhost:3000/chat/chatVoice");
         if (!response.ok) {
           throw new Error("Failed to start recording");
         }
@@ -32,52 +48,33 @@ const MobileChatInterface = () => {
       setIsLoading(true);
 
       try {
-        const response = await fetch("https://localhost:3000/quitChat");
+        const response = await fetch("http://localhost:3000/chat/quitChat");
         if (!response.ok) {
           throw new Error("Failed to get response");
         }
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let buffer = "";
 
         while (true) {
           const { done, value } = await reader.read();
 
-          if (done) {
-            // 버퍼에 남은 데이터 처리
-            if (buffer) {
-              try {
-                const message = JSON.parse(buffer);
-                setMessages((prev) => [...prev, message]);
-              } catch (e) {
-                console.error("Error parsing remaining buffer:", e);
-              }
-            }
-            break;
-          }
+          if (done) break;
 
-          // 새로운 청크를 버퍼에 추가
-          buffer += decoder.decode(value, { stream: true });
+          const chunk = decoder.decode(value);
+          const messages = chunk.split("\n").filter((line) => line.trim());
 
-          // 완전한 JSON 객체들을 찾아서 처리
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || ""; // 마지막 불완전한 라인은 버퍼에 저장
-
-          for (const line of lines) {
-            if (line.trim()) {
-              try {
-                const message = JSON.parse(line);
-                console.log("Received message:", message); // 디버깅용
-                setMessages((prev) => [...prev, message]);
-              } catch (e) {
-                console.error("Error parsing message:", e, "Line:", line);
-              }
+          for (const message of messages) {
+            try {
+              const parsedMessage = JSON.parse(message);
+              setMessages((prev) => [...prev, parsedMessage]);
+            } catch (e) {
+              console.error("파싱 에러:", e);
             }
           }
         }
       } catch (error) {
-        console.error("Error processing response:", error);
+        console.error("응답 처리 에러:", error);
       } finally {
         setIsLoading(false);
       }
@@ -86,7 +83,9 @@ const MobileChatInterface = () => {
 
   return (
     <div className="flex flex-col h-screen p-4">
-      <header className="text-center text-xl font-bold mb-4">Helper Pat</header>
+      <header className="text-center text-xl font-bold mb-4 bg-yellow-100 border">
+        Helper Pat
+      </header>
       <div className="flex-grow overflow-y-auto space-y-4">
         {messages.map((message, index) => (
           <div
@@ -102,22 +101,54 @@ const MobileChatInterface = () => {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <div className="mt-4 text-center">
-        <button
-          onClick={handleButtonPress}
-          disabled={isLoading}
-          className={`px-4 py-2 rounded-md transition duration-300 ${
-            isLoading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 text-white"
-          }`}
-        >
-          {isLoading
-            ? "Processing..."
-            : isPressed
-            ? "Stop Recording"
-            : "Send Message"}
-        </button>
+      <div className="mt-4 text-center gap-4 flex justify-center">
+        <div>
+          <button
+            onClick={handleButtonPress}
+            disabled={isLoading}
+            className={`px-4 py-2 rounded-md transition duration-300 ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
+          >
+            {isLoading
+              ? "Processing..."
+              : isPressed
+              ? "Stop Recording"
+              : "Send Message"}
+          </button>
+        </div>
+        <div>
+          <button
+            className="px-4 py-2 rounded-md transition duration-300 bg-blue-500 hover:bg-blue-600 text-white"
+            onClick={() => {
+              handleRobot("moveRobot");
+            }}
+          >
+            moveRobot
+          </button>
+        </div>
+        <div>
+          <button
+            className="px-4 py-2 rounded-md transition duration-300 bg-blue-500 hover:bg-blue-600 text-white"
+            onClick={() => {
+              handleRobot("rotate");
+            }}
+          >
+            rotate
+          </button>
+        </div>
+        <div>
+          <button
+            className="px-4 py-2 rounded-md transition duration-300 bg-blue-500 hover:bg-blue-600 text-white"
+            onClick={() => {
+              handleRobot("sit");
+            }}
+          >
+            sit
+          </button>
+        </div>
       </div>
     </div>
   );
