@@ -10,12 +10,12 @@ const http = require("http");
 const { io } = require("socket.io-client");
 
 const app = express();
-const server = http.createServer(app);
 app.use(cors());
 
 // 로봇 서버(WebSocket)와 연결 설정
 const robotSocket = io("http://ROBOT_SERVER_URL:ROBOT_PORT"); // 로봇 서버 주소로 대체
-
+const port = process.env.PORT || "3000";
+app.set("port", port);
 robotSocket.on("connect", () => {
   console.log("Connected to robot server");
 });
