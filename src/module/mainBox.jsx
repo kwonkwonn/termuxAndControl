@@ -8,14 +8,14 @@ const MobileChatInterface = () => {
     if (!isPressed) {
       try {
         setIsPressed(true);
-        await fetch("https://localhost:3000/chatVoice");
+        await fetch("http://localhost:3000/chat/chatVoice");
       } catch (err) {
         console.log("Error starting recording:", err);
       }
     } else {
       setIsPressed(false);
       try {
-        const userResponse = await fetch("https://localhost:3000/quitChat");
+        const userResponse = await fetch("http://localhost:3000/chat/quitChat");
         const reader = userResponse.body.getReader();
         const decoder = new TextDecoder("utf-8");
 
