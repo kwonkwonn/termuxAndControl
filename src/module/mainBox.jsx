@@ -5,36 +5,42 @@ const MobileChatInterface = () => {
   const [isPressed, setIsPressed] = useState(false);
 
   const handleButtonPress = async () => {
-    setIsPressed(true);
-
-    try {
-      // First fetch - user message
-      const userResponse = await fetch("/your-api-endpoint");
-      const userData = await userResponse.json();
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "user",
-          content: userData.message,
-        },
-      ]);
-
-      // Second fetch - AI response
-      const aiResponse = await fetch("/your-ai-endpoint");
-      const aiData = await aiResponse.json();
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "ai",
-          content: aiData.message,
-        },
-      ]);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
+    if (isPressed.valueOf(false)) {
+      try {
+        setIsPressed(true);
+        const userResponse = await fetch("https://localhost:3000/chatVoice");
+      } catch (err) {
+        console.log("err:", err);
+      }
+    } else {
       setIsPressed(false);
+      try {
+        const userResponse = await fetch("https://localhost:3000/quitChat");
+        const userData = await userResponse.json();
+        try {
+          setMessages((prev) => [
+            {
+              type: "user",
+              content: userData.message,
+            },
+          ]);
+        } catch (err) {
+          console.error("Error:", error);
+        }
+        const aiResponse = await fetch("/your-ai-endpoint");
+        aiData = await aiResponse.json();
+        userData = await userResponse.json();
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            type: "ai",
+            content: aiData.message,
+          },
+        ]);
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
