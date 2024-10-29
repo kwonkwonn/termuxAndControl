@@ -30,51 +30,33 @@ router.get("/quitChat", async function (req, res, next) {
   try {
     vibrate(1000);
 
-    // CORS 헤더 설정
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Content-Type", "text/plain");
-    res.setHeader("Transfer-Encoding", "chunked");
+    res.setHeader("Content-Type", "application/json"); // text/plain 대신 application/json 사용
 
-    // Step 1: Stop recording
     await quitRecord(0, sessionNumber);
-
-    // Step 2: Get voice transcription
     const voiceResponse = await sendVoice(sessionNumber);
-    console.log("Voice response:", voiceResponse); // 디버깅용
 
-    // 사용자 메시지 전송
-    const userMessage =
+    res.write(
       JSON.stringify({
         type: "user",
         content: voiceResponse,
-      }) + "\n";
-    res.write(userMessage);
+      }) + "\n"
+    );
 
-    // Step 3: Get AI response
     const aiAnswer = await chatAI(voiceResponse);
-    console.log("AI response:", aiAnswer); // 디버깅용
 
-    // AI 메시지 전송
-    const aiMessage =
+    res.write(
       JSON.stringify({
         type: "ai",
         content: aiAnswer,
-      }) + "\n";
-    res.write(aiMessage);
+      }) + "\n"
+    );
 
-    // Update session number
     sessionNumber = (sessionNumber + 1) % 20;
-
     res.end();
   } catch (error) {
     console.error("Server error:", error);
-    res.write(
-      JSON.stringify({
-        type: "error",
-        content: error.message,
-      }) + "\n"
-    );
-    res.end();
+    res.status(500).json({ error: error.message });
   }
 });
 
