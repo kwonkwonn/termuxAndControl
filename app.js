@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 
 // 로봇 서버(WebSocket)와 연결 설정
-const robotSocket = io("http://ROBOT_SERVER_URL:ROBOT_PORT"); // 로봇 서버 주소로 대체
+const robotSocket = io("http://172.100.13.58:8888"); // 로봇 서버 주소로 대체
 robotSocket.on("connect", () => {
   console.log("Connected to robot server");
 });
@@ -60,4 +60,4 @@ app.use(function (err, req, res, next) {
   res.render("error");
 });
 
-module.exports = { app, server };
+module.exports = app;

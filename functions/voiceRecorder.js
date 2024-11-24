@@ -20,7 +20,6 @@ const temperature = 0.7; // 온도 값 설정
 
 async function voiceRecord(time, number) {
   try {
-   execPromise(`rm ./voiceRecorded/*`); 
 	
 
 
@@ -36,7 +35,8 @@ const { stdout, stderr } = await execPromise(
 }
 
 async function quitRecord(number) {
-  try {
+console.log(number);  
+try {
     await execPromise(`termux-microphone-record -q`);
     console.log("녹음 중지됨");
 
@@ -58,6 +58,7 @@ async function sendVoice(number) {
       model: "whisper-1",
 	    response_format:"text",
     });
+	console.log(response);
 	return response;
 	}catch(err){
 		console.log(err);
@@ -81,7 +82,9 @@ async function chatAI(response){
            },
          ],
        });
+	
 
+       console.log(chatResponse.choices[0].message.content);
        return chatResponse.choices[0].message.content;
 }catch (error) {
     console.error("OpenAI API 호출 중 오류 발생:", error);

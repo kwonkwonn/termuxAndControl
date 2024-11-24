@@ -8,18 +8,18 @@ const {
 const { vibrate } = require("../functions/vibrate.js");
 const { exec } = require("child_process");
 const dotenv = require("dotenv");
+const sessionManager=require("../functions/sessionManager.js");
 
 dotenv.config();
-var sessionNumber = 0;
 
 var express = require("express");
 var router = express.Router();
 
 router.get("/chatVoice", function (req, res, next) {
   vibrate(1000);
-
+const currentSession= sessionManager.getSession();
   try {
-    voiceRecord(0, sessionNumber);
+    voiceRecord(0, currentSession);
   } catch (error) {
     res.send(error);
   }
@@ -32,11 +32,13 @@ router.get("/quitChat", async function (req, res, next) {
 
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Content-Type", "application/json"); // text/plain 대신 application/json 사용
+   const currentSession=sessionManager.getSession();
+    await quitRecord(0, currentSession);
+    const voiceResponse = await sendVoice(currentSession);
+    sessionManager.incrementSession();
 
-    await quitRecord(0, sessionNumber);
-    const voiceResponse = await sendVoice(sessionNumber);
-
-    res.write(
+console.log(sessionManager.getSession());    
+res.write(
       JSON.stringify({
         type: "user",
         content: voiceResponse,
@@ -52,7 +54,8 @@ router.get("/quitChat", async function (req, res, next) {
       }) + "\n"
     );
 
-    sessionNumber = (sessionNumber + 1) % 20;
+
+
     res.end();
   } catch (error) {
     console.error("Server error:", error);
