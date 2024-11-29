@@ -12,43 +12,40 @@ const { io } = require("socket.io-client");
 const app = express();
 app.use(cors());
 
-const net =require('net');
-const testTCTConnection=()=>{
-	const client= new net.Socket();
-	client.connect(8888, '192.168.245.62', ()=>{
-		console.log('success');
-		client.write(JSON.stringify({command:'1'}));
-		client.destroy();
-	});
-	client.on('error',(err)=>{
-		console.error('error',err);
-	});
+// const net =require('net');
+// const testTCTConnection=()=>{
+// 	const client= new net.Socket();
+// 	client.connect(8888, '192.168.245.62', ()=>{
+// 		console.log('success');
+// 		client.write(JSON.stringify({command:'1'}));
+// 		client.destroy();
+// 	});
+// 	client.on('error',(err)=>{
+// 		console.error('error',err);
+// 	});
 
-
-};
-
-
+// };
 
 // 로봇 서버(WebSocket)와 연결 설정
-const robotSocket = io("http://192.168.245.62:8888",{
-	transport:['websocket', 'polling'],
-	timeout:5000,
-	reconnection: true,
-	reconnectionAttepts: 5,
-	reconnectionDelay: 1000,
-	debug:true}); // 로봇 서버 주소로 대체
+// const robotSocket = io("http://192.168.245.62:8888",{
+// 	transport:['websocket', 'polling'],
+// 	timeout:5000,
+// 	reconnection: true,
+// 	reconnectionAttepts: 5,
+// 	reconnectionDelay: 1000,
+// 	debug:true}); // 로봇 서버 주소로 대체
 
-robotSocket.on("connect", () => {
-  console.log("Connected to robot server");
-});
+// robotSocket.on("connect", () => {
+//   console.log("Connected to robot server");
+// });
 
-robotSocket.on("connection_error", (error) => {
-  console.error("Disconnected from robot server", error);
-});
-robotSocket.on("disconnect", (reason) => {
-  console.log("Disconnected from robot server",reason);
-});
-console.log("connecting");
+// robotSocket.on("connection_error", (error) => {
+//   console.error("Disconnected from robot server", error);
+// });
+// robotSocket.on("disconnect", (reason) => {
+//   console.log("Disconnected from robot server",reason);
+// });
+// console.log("connecting");
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
@@ -58,7 +55,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
 
 app.set("robotSocket", robotSocket);
 app.use((req, res, next) => {

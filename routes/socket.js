@@ -1,20 +1,22 @@
 const express = require("express");
+const { sendCommandToRobot } = require("../functions/socket"); // socket.js에서 가져오기
 const router = express.Router();
 
-router.post("/roboControl", (req, res) => {
+router.post("/roboControl", async (req, res) => {
   const { command, text } = req.body;
-  const robotSocket = req.robotSocket; // 미들웨어에서 전달된 robotSocket 사용
-console.log(robotSocket);
-  if (robotSocket && robotSocket.connected) {
-    robotSocket.emit("control", { command, text });
-    res.send("Command sent to robot");
-  } else if(!robotSocket) {
-	console.error("robot is not initial");
-  }else if(!robotSocket.connected){
-	  console.err("robot not conenected");}
 
-	else {
-    res.status(500).send("Robot server is not connected");
+  if (!command) {
+    return res.status(400).json({ error: "Command is required" });
+  }
+
+  try {
+    const response = await sendCommandToRobot(command);
+    res.status(200).json({ message: "Command sent to robot", response });
+  } catch (err) {
+    console.error("Failed to send command:", err.message);
+    res
+      .status(500)
+      .json({ error: "Failed to send command to robot", details: err.message });
   }
 });
 
