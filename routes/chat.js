@@ -18,7 +18,8 @@ var router = express.Router();
 router.get("/chatVoice", function (req, res, next) {
   vibrate(1000);
 const currentSession= sessionManager.getSession();
-  try {
+  console.log("received number", currentSession);
+	try {
     voiceRecord(0, currentSession);
   } catch (error) {
     res.send(error);
@@ -33,11 +34,9 @@ router.get("/quitChat", async function (req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Content-Type", "application/json"); // text/plain 대신 application/json 사용
    const currentSession=sessionManager.getSession();
-    await quitRecord(0, currentSession);
+    await quitRecord(currentSession);
     const voiceResponse = await sendVoice(currentSession);
-    sessionManager.incrementSession();
 
-console.log(sessionManager.getSession());    
 res.write(
       JSON.stringify({
         type: "user",
@@ -54,7 +53,10 @@ res.write(
       }) + "\n"
     );
 
+	
+    sessionManager.incrementSession();
 
+console.log(sessionManager.getSession());    
 
     res.end();
   } catch (error) {

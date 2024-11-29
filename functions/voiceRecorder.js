@@ -22,7 +22,7 @@ async function voiceRecord(time, number) {
   try {
 	
 
-
+console.log("voiceRecord index", number);
 const { stdout, stderr } = await execPromise(
       `termux-microphone-record -e awr_wide -f ./voiceRecorded/voice${number}.amr -l ${time}`
     );
