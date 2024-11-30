@@ -56,11 +56,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.set("robotSocket", robotSocket);
-app.use((req, res, next) => {
-  req.robotSocket = robotSocket;
-  next();
-});
 app.use("/chat", chatRouter);
 app.use("/robot", socketRouter);
 
