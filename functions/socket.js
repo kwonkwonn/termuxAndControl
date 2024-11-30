@@ -1,3 +1,4 @@
+const { error } = require("console");
 const net = require("net");
 
 let client;
@@ -21,7 +22,7 @@ function initializeRobotSocket() {
   });
 }
 
-function sendCommandToRobot(command) {
+function sendCommandToRobot(command, text) {
   return new Promise((resolve, reject) => {
     if (!client) {
       initializeRobotSocket(); // 연결이 없다면 초기화
@@ -31,9 +32,8 @@ function sendCommandToRobot(command) {
       ); // 재시도
       return;
     }
-
     try {
-      const message = JSON.stringify({ command: command });
+      const message = JSON.stringify({ command: command, message: text });
       client.write(message, () => {
         console.log("Message sent:", message);
         resolve("Command sent successfully");
@@ -43,6 +43,27 @@ function sendCommandToRobot(command) {
       reject(err);
     }
   });
+}
+
+async function socketSendParsing(aiAnswer) {
+  let command;
+  if (aiAnswer.command == "bark") {
+    command = 6;
+  } else if (aiAnswer.command == "handle_emergency") {
+    command = 1;
+    //추가 행동
+  } else if (aiAnswer.command == "dance") {
+    command = 7;
+  } else if (aiAnswer.command == "sit_down") {
+    command = 4;
+  } else if (aiAnswer.command == "sit_up") {
+    command = 5;
+  } else if (aiAnswer.command == null) {
+    return error;
+  }
+
+  const response = await sendCommandToRobot(command, text);
+  return response;
 }
 
 // 서버 실행 시 소켓 초기화
